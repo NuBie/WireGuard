@@ -15,7 +15,7 @@
  */
 typedef struct fe { u32 v[10]; } fe;
 
-/* fe_loose limbs are bounded by 3.375*2^26,3.375*2^25,3.375*2^26,3.375*2^25,etc.
+/* fe_loose limbs are bounded by 3.375*2^26,3.375*2^25,3.375*2^26,3.375*2^25,etc
  * Addition and subtraction produce fe_loose from (fe, fe).
  */
 typedef struct fe_loose { u32 v[10]; } fe_loose;
@@ -48,40 +48,44 @@ static __always_inline void fe_frombytes(fe *h, const u8 *s)
 	fe_frombytes_impl(h->v, s);
 }
 
-static __always_inline u8 /*bool*/ addcarryx_u25(u8 /*bool*/ c, u32 a, u32 b, u32 *low)
+static __always_inline u8 /*bool*/
+addcarryx_u25(u8 /*bool*/ c, u32 a, u32 b, u32 *low)
 {
-	/* This function extracts 25 bits of result and 1 bit of carry (26 total), so
-	 * a 32-bit intermediate is sufficient.
+	/* This function extracts 25 bits of result and 1 bit of carry
+	 * (26 total), so a 32-bit intermediate is sufficient.
 	 */
 	u32 x = a + b + c;
 	*low = x & ((1 << 25) - 1);
 	return (x >> 25) & 1;
 }
 
-static __always_inline u8 /*bool*/ addcarryx_u26(u8 /*bool*/ c, u32 a, u32 b, u32 *low)
+static __always_inline u8 /*bool*/
+addcarryx_u26(u8 /*bool*/ c, u32 a, u32 b, u32 *low)
 {
-	/* This function extracts 26 bits of result and 1 bit of carry (27 total), so
-	 * a 32-bit intermediate is sufficient.
+	/* This function extracts 26 bits of result and 1 bit of carry
+	 * (27 total), so a 32-bit intermediate is sufficient.
 	 */
 	u32 x = a + b + c;
 	*low = x & ((1 << 26) - 1);
 	return (x >> 26) & 1;
 }
 
-static __always_inline u8 /*bool*/ subborrow_u25(u8 /*bool*/ c, u32 a, u32 b, u32 *low)
+static __always_inline u8 /*bool*/
+subborrow_u25(u8 /*bool*/ c, u32 a, u32 b, u32 *low)
 {
-	/* This function extracts 25 bits of result and 1 bit of borrow (26 total), so
-	 * a 32-bit intermediate is sufficient.
+	/* This function extracts 25 bits of result and 1 bit of borrow
+	 * (26 total), so a 32-bit intermediate is sufficient.
 	 */
 	u32 x = a - b - c;
 	*low = x & ((1 << 25) - 1);
 	return x >> 31;
 }
 
-static __always_inline u8 /*bool*/ subborrow_u26(u8 /*bool*/ c, u32 a, u32 b, u32 *low)
+static __always_inline u8 /*bool*/
+subborrow_u26(u8 /*bool*/ c, u32 a, u32 b, u32 *low)
 {
-	/* This function extracts 26 bits of result and 1 bit of borrow (27 total), so
-	 * a 32-bit intermediate is sufficient.
+	/* This function extracts 26 bits of result and 1 bit of borrow
+	 *(27 total), so a 32-bit intermediate is sufficient.
 	 */
 	u32 x = a - b - c;
 	*low = x & ((1 << 26) - 1);
@@ -424,7 +428,8 @@ static __always_inline void fe_mul_tlt(fe *h, const fe_loose *f, const fe *g)
 	fe_mul_impl(h->v, f->v, g->v);
 }
 
-static __always_inline void fe_mul_tll(fe *h, const fe_loose *f, const fe_loose *g)
+static __always_inline void
+fe_mul_tll(fe *h, const fe_loose *f, const fe_loose *g)
 {
 	fe_mul_impl(h->v, f->v, g->v);
 }
@@ -741,7 +746,9 @@ static __always_inline void fe_mul121666(fe *h, const fe_loose *f)
 	fe_mul_121666_impl(h->v, f->v);
 }
 
-static void curve25519_generic(u8 out[CURVE25519_POINT_SIZE], const u8 scalar[CURVE25519_POINT_SIZE], const u8 point[CURVE25519_POINT_SIZE])
+static void curve25519_generic(u8 out[CURVE25519_POINT_SIZE],
+			       const u8 scalar[CURVE25519_POINT_SIZE],
+			       const u8 point[CURVE25519_POINT_SIZE])
 {
 	fe x1, x2, z2, x3, z3, tmp0, tmp1;
 	fe_loose x2l, z2l, x3l, tmp0l, tmp1l;
@@ -753,22 +760,29 @@ static void curve25519_generic(u8 out[CURVE25519_POINT_SIZE], const u8 scalar[CU
 	normalize_secret(e);
 
 	/* The following implementation was transcribed to Coq and proven to
-	 * correspond to unary scalar multiplication in affine coordinates given that
-	 * x1 != 0 is the x coordinate of some point on the curve. It was also checked
-	 * in Coq that doing a ladderstep with x1 = x3 = 0 gives z2' = z3' = 0, and z2
-	 * = z3 = 0 gives z2' = z3' = 0. The statement was quantified over the
-	 * underlying field, so it applies to Curve25519 itself and the quadratic
-	 * twist of Curve25519. It was not proven in Coq that prime-field arithmetic
-	 * correctly simulates extension-field arithmetic on prime-field values.
-	 * The decoding of the byte array representation of e was not considered.
+	 * correspond to unary scalar multiplication in affine coordinates given
+	 * that x1 != 0 is the x coordinate of some point on the curve. It was
+	 * also checked in Coq that doing a ladderstep with x1 = x3 = 0 gives
+	 * z2' = z3' = 0, and z2 = z3 = 0 gives z2' = z3' = 0. The statement was
+	 * quantified over the underlying field, so it applies to Curve25519
+	 * itself and the quadratic twist of Curve25519. It was not proven in
+	 * Coq that prime-field arithmetic correctly simulates extension-field
+	 * arithmetic on prime-field values. The decoding of the byte array
+	 * representation of e was not considered.
+	 *
 	 * Specification of Montgomery curves in affine coordinates:
 	 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Spec/MontgomeryCurve.v#L27>
-	 * Proof that these form a group that is isomorphic to a Weierstrass curve:
+	 *
+	 * Proof that these form a group that is isomorphic to a Weierstrass
+	 * curve:
 	 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/AffineProofs.v#L35>
-	 * Coq transcription and correctness proof of the loop (where scalarbits=255):
+	 *
+	 * Coq transcription and correctness proof of the loop
+	 * (where scalarbits=255):
 	 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZ.v#L118>
 	 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZProofs.v#L278>
-	 * preconditions: 0 <= e < 2^255 (not necessarily e < order), fe_invert(0) = 0
+	 * preconditions: 0 <= e < 2^255 (not necessarily e < order),
+	 * fe_invert(0) = 0
 	 */
 	fe_frombytes(&x1, point);
 	fe_1(&x2);
@@ -777,19 +791,24 @@ static void curve25519_generic(u8 out[CURVE25519_POINT_SIZE], const u8 scalar[CU
 	fe_1(&z3);
 
 	for (pos = 254; pos >= 0; --pos) {
-		/* loop invariant as of right before the test, for the case where x1 != 0:
-		 *   pos >= -1; if z2 = 0 then x2 is nonzero; if z3 = 0 then x3 is nonzero
-		 *   let r := e >> (pos+1) in the following equalities of projective points:
+		/* loop invariant as of right before the test, for the case
+		 * where x1 != 0:
+		 *   pos >= -1; if z2 = 0 then x2 is nonzero; if z3 = 0 then x3
+		 *   is nonzero
+		 *   let r := e >> (pos+1) in the following equalities of
+		 *   projective points:
 		 *   to_xz (r*P)     === if swap then (x3, z3) else (x2, z2)
 		 *   to_xz ((r+1)*P) === if swap then (x2, z2) else (x3, z3)
-		 *   x1 is the nonzero x coordinate of the nonzero point (r*P-(r+1)*P)
+		 *   x1 is the nonzero x coordinate of the nonzero
+		 *   point (r*P-(r+1)*P)
 		 */
 		unsigned b = 1 & (e[pos / 8] >> (pos & 7));
 		swap ^= b;
 		fe_cswap(&x2, &x3, swap);
 		fe_cswap(&z2, &z3, swap);
 		swap = b;
-		/* Coq transcription of ladderstep formula (called from transcribed loop):
+		/* Coq transcription of ladderstep formula (called from
+		 * transcribed loop):
 		 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZ.v#L89>
 		 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZProofs.v#L131>
 		 * x1 != 0 <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZProofs.v#L217>
@@ -814,7 +833,9 @@ static void curve25519_generic(u8 out[CURVE25519_POINT_SIZE], const u8 scalar[CU
 		fe_mul_ttt(&z3, &x1, &z2);
 		fe_mul_tll(&z2, &tmp1l, &tmp0l);
 	}
-	/* here pos=-1, so r=e, so to_xz (e*P) === if swap then (x3, z3) else (x2, z2) */
+	/* here pos=-1, so r=e, so to_xz (e*P) === if swap then (x3, z3)
+	 * else (x2, z2)
+	 */
 	fe_cswap(&x2, &x3, swap);
 	fe_cswap(&z2, &z3, swap);
 

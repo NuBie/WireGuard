@@ -3,11 +3,11 @@
  * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
  */
 
-#ifndef _WG_CHACHA20_H
-#define _WG_CHACHA20_H
+#ifndef _ZINC_CHACHA20_H
+#define _ZINC_CHACHA20_H
 
-#include "simd.h"
 #include <asm/unaligned.h>
+#include <linux/simd.h>
 #include <linux/kernel.h>
 #include <linux/types.h>
 
@@ -26,7 +26,9 @@ struct chacha20_ctx {
 
 void chacha20_fpu_init(void);
 
-static inline void chacha20_init(struct chacha20_ctx *state, const u8 key[CHACHA20_KEY_SIZE], const u64 nonce)
+static inline void chacha20_init(struct chacha20_ctx *state,
+				 const u8 key[CHACHA20_KEY_SIZE],
+				 const u64 nonce)
 {
 	state->key[0] = get_unaligned_le32(key + 0);
 	state->key[1] = get_unaligned_le32(key + 4);
@@ -40,8 +42,12 @@ static inline void chacha20_init(struct chacha20_ctx *state, const u8 key[CHACHA
 	state->counter[2] = nonce & U32_MAX;
 	state->counter[3] = nonce >> 32;
 }
-void chacha20(struct chacha20_ctx *state, u8 *dst, const u8 *src, u32 len, simd_context_t simd_context);
+void chacha20(struct chacha20_ctx *state, u8 *dst, const u8 *src, u32 len,
+	      simd_context_t simd_context);
 
-void hchacha20(u8 derived_key[CHACHA20_KEY_SIZE], const u8 nonce[HCHACHA20_NONCE_SIZE], const u8 key[HCHACHA20_KEY_SIZE], simd_context_t simd_context);
+/* Derived key should be 32-bit aligned */
+void hchacha20(u8 derived_key[CHACHA20_KEY_SIZE],
+	       const u8 nonce[HCHACHA20_NONCE_SIZE],
+	       const u8 key[HCHACHA20_KEY_SIZE], simd_context_t simd_context);
 
-#endif /* _WG_CHACHA20_H */
+#endif /* _ZINC_CHACHA20_H */

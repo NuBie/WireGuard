@@ -67,7 +67,8 @@ static __always_inline void fproduct_copy_from_wide_(u64 *output, u128 *input)
 	}
 }
 
-static __always_inline void fproduct_sum_scalar_multiplication_(u128 *output, u64 *input, u64 s)
+static __always_inline void
+fproduct_sum_scalar_multiplication_(u128 *output, u64 *input, u64 s)
 {
 	output[0] += (u128)input[0] * s;
 	output[1] += (u128)input[1] * s;
@@ -146,7 +147,8 @@ static __always_inline void fmul_shift_reduce(u64 *output)
 	output[0] = 19 * b0;
 }
 
-static __always_inline void fmul_mul_shift_reduce_(u128 *output, u64 *input, u64 *input21)
+static __always_inline void fmul_mul_shift_reduce_(u128 *output, u64 *input,
+						   u64 *input21)
 {
 	u32 i;
 	u64 input2i;
@@ -219,11 +221,16 @@ static __always_inline void fsquare_fsquare__(u128 *tmp, u64 *output)
 	u64 d2 = r2 * 2 * 19;
 	u64 d419 = r4 * 19;
 	u64 d4 = d419 * 2;
-	u128 s0 = ((((((u128)(r0) * (r0))) + (((u128)(d4) * (r1))))) + (((u128)(d2) * (r3))));
-	u128 s1 = ((((((u128)(d0) * (r1))) + (((u128)(d4) * (r2))))) + (((u128)(r3 * 19) * (r3))));
-	u128 s2 = ((((((u128)(d0) * (r2))) + (((u128)(r1) * (r1))))) + (((u128)(d4) * (r3))));
-	u128 s3 = ((((((u128)(d0) * (r3))) + (((u128)(d1) * (r2))))) + (((u128)(r4) * (d419))));
-	u128 s4 = ((((((u128)(d0) * (r4))) + (((u128)(d1) * (r3))))) + (((u128)(r2) * (r2))));
+	u128 s0 = ((((((u128)(r0) * (r0))) + (((u128)(d4) * (r1))))) +
+		   (((u128)(d2) * (r3))));
+	u128 s1 = ((((((u128)(d0) * (r1))) + (((u128)(d4) * (r2))))) +
+		   (((u128)(r3 * 19) * (r3))));
+	u128 s2 = ((((((u128)(d0) * (r2))) + (((u128)(r1) * (r1))))) +
+		   (((u128)(d4) * (r3))));
+	u128 s3 = ((((((u128)(d0) * (r3))) + (((u128)(d1) * (r2))))) +
+		   (((u128)(r4) * (d419))));
+	u128 s4 = ((((((u128)(d0) * (r4))) + (((u128)(d1) * (r3))))) +
+		   (((u128)(r2) * (r2))));
 	tmp[0] = s0;
 	tmp[1] = s1;
 	tmp[2] = s2;
@@ -258,7 +265,8 @@ static __always_inline void fsquare_fsquare_(u128 *tmp, u64 *output)
 	output[1] = i1_;
 }
 
-static __always_inline void fsquare_fsquare_times_(u64 *output, u128 *tmp, u32 count1)
+static __always_inline void fsquare_fsquare_times_(u64 *output, u128 *tmp,
+						   u32 count1)
 {
 	u32 i;
 	fsquare_fsquare_(tmp, output);
@@ -266,14 +274,16 @@ static __always_inline void fsquare_fsquare_times_(u64 *output, u128 *tmp, u32 c
 		fsquare_fsquare_(tmp, output);
 }
 
-static __always_inline void fsquare_fsquare_times(u64 *output, u64 *input, u32 count1)
+static __always_inline void fsquare_fsquare_times(u64 *output, u64 *input,
+						  u32 count1)
 {
 	u128 t[5];
 	memcpy(output, input, 5 * sizeof(*input));
 	fsquare_fsquare_times_(output, t, count1);
 }
 
-static __always_inline void fsquare_fsquare_times_inplace(u64 *output, u32 count1)
+static __always_inline void fsquare_fsquare_times_inplace(u64 *output,
+							  u32 count1)
 {
 	u128 t[5];
 	fsquare_fsquare_times_(output, t, count1);
@@ -425,7 +435,8 @@ static __always_inline void crecip(u64 *output, u64 *input)
 	crecip_crecip(output, input);
 }
 
-static __always_inline void point_swap_conditional_step(u64 *a, u64 *b, u64 swap1, u32 ctr)
+static __always_inline void point_swap_conditional_step(u64 *a, u64 *b,
+							u64 swap1, u32 ctr)
 {
 	u32 i = ctr - 1;
 	u64 ai = a[i];
@@ -459,7 +470,8 @@ static __always_inline void point_copy(u64 *output, u64 *input)
 	memcpy(output + 5, input + 5, 5 * sizeof(*input));
 }
 
-static __always_inline void addanddouble_fmonty(u64 *pp, u64 *ppq, u64 *p, u64 *pq, u64 *qmqp)
+static __always_inline void addanddouble_fmonty(u64 *pp, u64 *ppq, u64 *p,
+						u64 *pq, u64 *qmqp)
 {
 	u64 *qx = qmqp;
 	u64 *x2 = pp;
@@ -524,7 +536,9 @@ static __always_inline void addanddouble_fmonty(u64 *pp, u64 *ppq, u64 *p, u64 *
 	}
 }
 
-static __always_inline void ladder_smallloop_cmult_small_loop_step(u64 *nq, u64 *nqpq, u64 *nq2, u64 *nqpq2, u64 *q, u8 byt)
+static __always_inline void
+ladder_smallloop_cmult_small_loop_step(u64 *nq, u64 *nqpq, u64 *nq2, u64 *nqpq2,
+				       u64 *q, u8 byt)
 {
 	u64 bit0 = (u64)(byt >> 7);
 	u64 bit;
@@ -534,7 +548,9 @@ static __always_inline void ladder_smallloop_cmult_small_loop_step(u64 *nq, u64 
 	point_swap_conditional(nq2, nqpq2, bit);
 }
 
-static __always_inline void ladder_smallloop_cmult_small_loop_double_step(u64 *nq, u64 *nqpq, u64 *nq2, u64 *nqpq2, u64 *q, u8 byt)
+static __always_inline void
+ladder_smallloop_cmult_small_loop_double_step(u64 *nq, u64 *nqpq, u64 *nq2,
+					      u64 *nqpq2, u64 *q, u8 byt)
 {
 	u8 byt1;
 	ladder_smallloop_cmult_small_loop_step(nq, nqpq, nq2, nqpq2, q, byt);
@@ -542,19 +558,26 @@ static __always_inline void ladder_smallloop_cmult_small_loop_double_step(u64 *n
 	ladder_smallloop_cmult_small_loop_step(nq2, nqpq2, nq, nqpq, q, byt1);
 }
 
-static __always_inline void ladder_smallloop_cmult_small_loop(u64 *nq, u64 *nqpq, u64 *nq2, u64 *nqpq2, u64 *q, u8 byt, u32 i)
+static __always_inline void
+ladder_smallloop_cmult_small_loop(u64 *nq, u64 *nqpq, u64 *nq2, u64 *nqpq2,
+				  u64 *q, u8 byt, u32 i)
 {
 	while (i--) {
-		ladder_smallloop_cmult_small_loop_double_step(nq, nqpq, nq2, nqpq2, q, byt);
+		ladder_smallloop_cmult_small_loop_double_step(nq, nqpq, nq2,
+							      nqpq2, q, byt);
 		byt <<= 2;
 	}
 }
 
-static __always_inline void ladder_bigloop_cmult_big_loop(u8 *n1, u64 *nq, u64 *nqpq, u64 *nq2, u64 *nqpq2, u64 *q, u32 i)
+static __always_inline void ladder_bigloop_cmult_big_loop(u8 *n1, u64 *nq,
+							  u64 *nqpq, u64 *nq2,
+							  u64 *nqpq2, u64 *q,
+							  u32 i)
 {
 	while (i--) {
 		u8 byte = n1[i];
-		ladder_smallloop_cmult_small_loop(nq, nqpq, nq2, nqpq2, q, byte, 4);
+		ladder_smallloop_cmult_small_loop(nq, nqpq, nq2, nqpq2, q,
+						  byte, 4);
 	}
 }
 
@@ -727,7 +750,9 @@ static __always_inline void format_scalar_of_point(u8 *scalar, u64 *point)
 	format_fcontract(scalar, sc);
 }
 
-static void curve25519_generic(u8 mypublic[CURVE25519_POINT_SIZE], const u8 secret[CURVE25519_POINT_SIZE], const u8 basepoint[CURVE25519_POINT_SIZE])
+static void curve25519_generic(u8 mypublic[CURVE25519_POINT_SIZE],
+			       const u8 secret[CURVE25519_POINT_SIZE],
+			       const u8 basepoint[CURVE25519_POINT_SIZE])
 {
 	u64 buf0[10] __aligned(32) = { 0 };
 	u64 *x0 = buf0;

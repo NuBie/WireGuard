@@ -1,11 +1,11 @@
 /* SPDX-License-Identifier: GPL-2.0
  *
+ * Copyright (C) 2012 Samuel Neves <sneves@dei.uc.pt>. All Rights Reserved.
  * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
  *
- * Original author: Samuel Neves <sneves@dei.uc.pt>
  */
 
-#include "blake2s.h"
+#include <zinc/blake2s.h>
 
 #include <linux/types.h>
 #include <linux/string.h>
@@ -36,16 +36,16 @@ static const u32 blake2s_iv[8] = {
 };
 
 static const u8 blake2s_sigma[10][16] = {
-	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
-	{14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3},
-	{11, 8, 12, 0, 5, 2, 15, 13, 10, 14, 3, 6, 7, 1, 9, 4},
-	{7, 9, 3, 1, 13, 12, 11, 14, 2, 6, 5, 10, 4, 0, 15, 8},
-	{9, 0, 5, 7, 2, 4, 10, 15, 14, 1, 11, 12, 6, 8, 3, 13},
-	{2, 12, 6, 10, 0, 11, 8, 3, 4, 13, 7, 5, 15, 14, 1, 9},
-	{12, 5, 1, 15, 14, 13, 4, 10, 0, 7, 6, 3, 9, 2, 8, 11},
-	{13, 11, 7, 14, 12, 1, 3, 9, 5, 0, 15, 4, 8, 6, 2, 10},
-	{6, 15, 14, 9, 11, 3, 0, 8, 12, 2, 13, 7, 1, 4, 10, 5},
-	{10, 2, 8, 4, 7, 6, 1, 5, 15, 11, 9, 14, 3, 12, 13, 0},
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+	{ 14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3 },
+	{ 11, 8, 12, 0, 5, 2, 15, 13, 10, 14, 3, 6, 7, 1, 9, 4 },
+	{ 7, 9, 3, 1, 13, 12, 11, 14, 2, 6, 5, 10, 4, 0, 15, 8 },
+	{ 9, 0, 5, 7, 2, 4, 10, 15, 14, 1, 11, 12, 6, 8, 3, 13 },
+	{ 2, 12, 6, 10, 0, 11, 8, 3, 4, 13, 7, 5, 15, 14, 1, 9 },
+	{ 12, 5, 1, 15, 14, 13, 4, 10, 0, 7, 6, 3, 9, 2, 8, 11 },
+	{ 13, 11, 7, 14, 12, 1, 3, 9, 5, 0, 15, 4, 8, 6, 2, 10 },
+	{ 6, 15, 14, 9, 11, 3, 0, 8, 12, 2, 13, 7, 1, 4, 10, 5 },
+	{ 10, 2, 8, 4, 7, 6, 1, 5, 15, 11, 9, 14, 3, 12, 13, 0 },
 };
 
 static inline void blake2s_set_lastblock(struct blake2s_state *state)
@@ -55,13 +55,15 @@ static inline void blake2s_set_lastblock(struct blake2s_state *state)
 	state->f[0] = -1;
 }
 
-static inline void blake2s_increment_counter(struct blake2s_state *state, const u32 inc)
+static inline void blake2s_increment_counter(struct blake2s_state *state,
+					     const u32 inc)
 {
 	state->t[0] += inc;
 	state->t[1] += (state->t[0] < inc);
 }
 
-static inline void blake2s_init_param(struct blake2s_state *state, const blake2s_param *param)
+static inline void blake2s_init_param(struct blake2s_state *state,
+				      const blake2s_param *param)
 {
 	int i;
 
@@ -83,53 +85,42 @@ void blake2s_init(struct blake2s_state *state, const size_t outlen)
 #endif
 	blake2s_init_param(state, &param);
 }
+EXPORT_SYMBOL(blake2s_init);
 
-void blake2s_init_key(struct blake2s_state *state, const size_t outlen, const void *key, const size_t keylen)
+void blake2s_init_key(struct blake2s_state *state, const size_t outlen,
+		      const void *key, const size_t keylen)
 {
-	blake2s_param param = {
-		.digest_length = outlen,
-		.key_length = keylen,
-		.fanout = 1,
-		.depth = 1
-	};
+	blake2s_param param = { .digest_length = outlen,
+				.key_length = keylen,
+				.fanout = 1,
+				.depth = 1 };
 	u8 block[BLAKE2S_BLOCKBYTES] = { 0 };
 
 #ifdef DEBUG
-	BUG_ON(!outlen || outlen > BLAKE2S_OUTBYTES || !key || !keylen || keylen > BLAKE2S_KEYBYTES);
+	BUG_ON(!outlen || outlen > BLAKE2S_OUTBYTES || !key || !keylen ||
+	       keylen > BLAKE2S_KEYBYTES);
 #endif
 	blake2s_init_param(state, &param);
 	memcpy(block, key, keylen);
 	blake2s_update(state, block, BLAKE2S_BLOCKBYTES);
 	memzero_explicit(block, BLAKE2S_BLOCKBYTES);
 }
+EXPORT_SYMBOL(blake2s_init_key);
 
-#ifdef CONFIG_X86_64
-#include <asm/cpufeature.h>
-#include <asm/processor.h>
-#include <asm/fpu/api.h>
-#include <asm/simd.h>
-static bool blake2s_use_avx __ro_after_init;
-static bool blake2s_use_avx512 __ro_after_init;
+#ifndef HAVE_BLAKE2S_ARCH_IMPLEMENTATION
 void __init blake2s_fpu_init(void)
 {
-#ifndef CONFIG_UML
-	blake2s_use_avx = boot_cpu_has(X86_FEATURE_AVX) && cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL);
-#ifndef COMPAT_CANNOT_USE_AVX512
-	blake2s_use_avx512 = boot_cpu_has(X86_FEATURE_AVX) && boot_cpu_has(X86_FEATURE_AVX2) && boot_cpu_has(X86_FEATURE_AVX512F) && boot_cpu_has(X86_FEATURE_AVX512VL) && cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM | XFEATURE_MASK_AVX512, NULL);
-#endif
-#endif
 }
-#ifdef CONFIG_AS_AVX
-asmlinkage void blake2s_compress_avx(struct blake2s_state *state, const u8 *block, const size_t nblocks, const u32 inc);
-#endif
-#ifdef CONFIG_AS_AVX512
-asmlinkage void blake2s_compress_avx512(struct blake2s_state *state, const u8 *block, const size_t nblocks, const u32 inc);
-#endif
-#else
-void __init blake2s_fpu_init(void) { }
+static inline bool blake2s_arch(struct blake2s_state *state, const u8 *block,
+				const size_t nblocks, const u32 inc)
+{
+	return false;
+}
 #endif
 
-static inline void blake2s_compress(struct blake2s_state *state, const u8 *block, size_t nblocks, const u32 inc)
+static inline void blake2s_compress(struct blake2s_state *state,
+				    const u8 *block, size_t nblocks,
+				    const u32 inc)
 {
 	u32 m[16];
 	u32 v[16];
@@ -139,24 +130,8 @@ static inline void blake2s_compress(struct blake2s_state *state, const u8 *block
 	BUG_ON(nblocks > 1 && inc != BLAKE2S_BLOCKBYTES);
 #endif
 
-#ifdef CONFIG_X86_64
-#ifdef CONFIG_AS_AVX512
-	if (blake2s_use_avx512 && irq_fpu_usable()) {
-		kernel_fpu_begin();
-		blake2s_compress_avx512(state, block, nblocks, inc);
-		kernel_fpu_end();
+	if (blake2s_arch(state, block, nblocks, inc))
 		return;
-	}
-#endif
-#ifdef CONFIG_AS_AVX
-	if (blake2s_use_avx && irq_fpu_usable()) {
-		kernel_fpu_begin();
-		blake2s_compress_avx(state, block, nblocks, inc);
-		kernel_fpu_end();
-		return;
-	}
-#endif
-#endif
 
 	while (nblocks > 0) {
 		blake2s_increment_counter(state, inc);
@@ -234,7 +209,8 @@ void blake2s_update(struct blake2s_state *state, const u8 *in, size_t inlen)
 		inlen -= fill;
 	}
 	if (inlen > BLAKE2S_BLOCKBYTES) {
-		const size_t nblocks = (inlen + BLAKE2S_BLOCKBYTES - 1) / BLAKE2S_BLOCKBYTES;
+		const size_t nblocks =
+			(inlen + BLAKE2S_BLOCKBYTES - 1) / BLAKE2S_BLOCKBYTES;
 		/* Hash one less (full) block than strictly possible */
 		blake2s_compress(state, in, nblocks - 1, BLAKE2S_BLOCKBYTES);
 		in += BLAKE2S_BLOCKBYTES * (nblocks - 1);
@@ -243,15 +219,19 @@ void blake2s_update(struct blake2s_state *state, const u8 *in, size_t inlen)
 	memcpy(state->buf + state->buflen, in, inlen);
 	state->buflen += inlen;
 }
+EXPORT_SYMBOL(blake2s_update);
 
 void __blake2s_final(struct blake2s_state *state)
 {
 	blake2s_set_lastblock(state);
-	memset(state->buf + state->buflen, 0, BLAKE2S_BLOCKBYTES - state->buflen); /* Padding */
+	memset(state->buf + state->buflen, 0,
+	       BLAKE2S_BLOCKBYTES - state->buflen); /* Padding */
 	blake2s_compress(state, state->buf, 1, state->buflen);
 }
+EXPORT_SYMBOL(__blake2s_final);
 
-void blake2s_hmac(u8 *out, const u8 *in, const u8 *key, const size_t outlen, const size_t inlen, const size_t keylen)
+void blake2s_hmac(u8 *out, const u8 *in, const u8 *key, const size_t outlen,
+		  const size_t inlen, const size_t keylen)
 {
 	struct blake2s_state state;
 	u8 x_key[BLAKE2S_BLOCKBYTES] __aligned(__alignof__(u32)) = { 0 };
@@ -285,5 +265,6 @@ void blake2s_hmac(u8 *out, const u8 *in, const u8 *key, const size_t outlen, con
 	memzero_explicit(x_key, BLAKE2S_BLOCKBYTES);
 	memzero_explicit(i_hash, BLAKE2S_OUTBYTES);
 }
+EXPORT_SYMBOL(blake2s_hmac);
 
 #include "../selftest/blake2s.h"

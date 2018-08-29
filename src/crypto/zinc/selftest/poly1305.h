@@ -27,7 +27,6 @@ static const struct poly1305_testvec poly1305_testvecs[] = {
 				0x61, 0x70, 0x68, 0x69, 0x63, 0x20, 0x46, 0x6f,
 				0x72, 0x75, 0x6d, 0x20, 0x52, 0x65, 0x73, 0x65,
 				0x61, 0x72, 0x63, 0x68, 0x20, 0x47, 0x72, 0x6f,
-
 				0x75, 0x70
 			}
 		},
@@ -1520,10 +1519,12 @@ bool __init poly1305_selftest(void)
 			memset(&poly1305, 0, sizeof(poly1305));
 			poly1305_init(&poly1305, key, simd_context);
 			poly1305_update(&poly1305, in, 1, simd_context);
-			poly1305_update(&poly1305, in + 1, inlen - 1, simd_context);
+			poly1305_update(&poly1305, in + 1, inlen - 1,
+					simd_context);
 			poly1305_finish(&poly1305, out, simd_context);
 			if (memcmp(out, expected, expectedlen)) {
-				pr_info("poly1305 self-test %zu/1+(N-1): FAIL\n", i + 1);
+				pr_info("poly1305 self-test %zu/1+(N-1): FAIL\n",
+					i + 1);
 				success = false;
 			}
 		}
@@ -1535,10 +1536,12 @@ bool __init poly1305_selftest(void)
 			memset(&poly1305, 0, sizeof(poly1305));
 			poly1305_init(&poly1305, key, simd_context);
 			poly1305_update(&poly1305, in, half, simd_context);
-			poly1305_update(&poly1305, in + half, inlen - half, simd_context);
+			poly1305_update(&poly1305, in + half, inlen - half,
+					simd_context);
 			poly1305_finish(&poly1305, out, simd_context);
 			if (memcmp(out, expected, expectedlen)) {
-				pr_info("poly1305 self-test %zu/2: FAIL\n", i + 1);
+				pr_info("poly1305 self-test %zu/2: FAIL\n",
+					i + 1);
 				success = false;
 			}
 
@@ -1546,11 +1549,14 @@ bool __init poly1305_selftest(void)
 				memset(out, 0, sizeof(out));
 				memset(&poly1305, 0, sizeof(poly1305));
 				poly1305_init(&poly1305, key, simd_context);
-				poly1305_update(&poly1305, in, half, simd_context);
-				poly1305_update(&poly1305, in + half, inlen - half, simd_context);
+				poly1305_update(&poly1305, in, half,
+						simd_context);
+				poly1305_update(&poly1305, in + half,
+						inlen - half, simd_context);
 				poly1305_finish(&poly1305, out, simd_context);
 				if (memcmp(out, expected, expectedlen)) {
-					pr_info("poly1305 self-test %zu/%zu+%zu: FAIL\n", i + 1, half, inlen - half);
+					pr_info("poly1305 self-test %zu/%zu+%zu: FAIL\n",
+						i + 1, half, inlen - half);
 					success = false;
 				}
 			}

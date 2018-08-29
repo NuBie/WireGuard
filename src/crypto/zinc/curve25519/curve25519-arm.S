@@ -7,8 +7,6 @@
  * but has subsequently been manually reworked for use in kernel space.
  */
 
-#if IS_ENABLED(CONFIG_KERNEL_MODE_NEON)
-
 #include <linux/linkage.h>
 
 .text
@@ -2092,4 +2090,3 @@ ENTRY(curve25519_neon)
 	mov		sp, ip
 	pop		{r4-r11, pc}
 ENDPROC(curve25519_neon)
-#endif
