@@ -3,8 +3,11 @@
  * Copyright (C) 2016-2017 INRIA and Microsoft Corporation.
  * Copyright (C) 2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
  *
- * This is a machine-generated formally verified implementation of curve25519 DH from:
- * https://github.com/mitls/hacl-star
+ * This is a machine-generated formally verified implementation of Curve25519
+ * ECDH from: <https://github.com/mitls/hacl-star>. Though originally machine
+ * generated, it has been tweaked to be suitable for use in the kernel. It is
+ * optimized for 64-bit machines that can efficiently work with 128-bit
+ * integer types.
  */
 
 typedef __uint128_t u128;

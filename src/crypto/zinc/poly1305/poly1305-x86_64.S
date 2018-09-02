@@ -3,6 +3,8 @@
  * Copyright (C) 2017 Samuel Neves <sneves@dei.uc.pt>. All Rights Reserved.
  * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
  * Copyright 2016 The OpenSSL Project Authors. All Rights Reserved.
+ *
+ * This is based in part on Andy Polyakov's implementation from OpenSSL.
  */
 
 #include <linux/linkage.h>

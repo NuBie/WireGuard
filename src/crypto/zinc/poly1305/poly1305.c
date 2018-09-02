@@ -2,6 +2,10 @@
  *
  * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
  * Copyright 2016 The OpenSSL Project Authors. All Rights Reserved.
+ *
+ * Implementation of the Poly1305 message authenticator.
+ *
+ * Information: https://cr.yp.to/mac.html
  */
 
 #include <zinc/poly1305.h>

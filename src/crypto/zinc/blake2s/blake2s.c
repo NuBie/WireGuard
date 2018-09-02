@@ -3,6 +3,10 @@
  * Copyright (C) 2012 Samuel Neves <sneves@dei.uc.pt>. All Rights Reserved.
  * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
  *
+ * This is an implementation of the BLAKE2s hash and PRF functions.
+ *
+ * Information: https://blake2.net/
+ *
  */
 
 #include <zinc/blake2s.h>

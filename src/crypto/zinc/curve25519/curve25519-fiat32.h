@@ -3,8 +3,11 @@
  * Copyright (C) 2015-2016 The fiat-crypto Authors.
  * Copyright (C) 2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
  *
- * This is a machine-generated formally verified implementation of curve25519 DH from:
- * https://github.com/mit-plv/fiat-crypto
+ * This is a machine-generated formally verified implementation of Curve25519
+ * ECDH from: <https://github.com/mit-plv/fiat-crypto>. Though originally
+ * machine generated, it has been tweaked to be suitable for use in the kernel.
+ * It is optimized for 32-bit machines and machines that cannot work efficiently
+ * with 128-bit integer types.
  */
 
 /* fe means field element. Here the field is \Z/(2^255-19). An element t,
