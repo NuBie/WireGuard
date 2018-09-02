@@ -21,3 +21,4 @@ src/tests/qemu/distfiles/
 *.til
 *.pro.user
 .cache.mk
+*~
